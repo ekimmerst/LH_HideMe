@@ -16,7 +16,7 @@
 - Public repository: https://github.com/ekimmerst/hideme
 - Remote origin: https://github.com/ekimmerst/hideme.git
 - Branch: main, tracking origin/main.
-- As of October 16, 2026: version 0.18.0; interface version 16001.
+- As of October 21, 2026: version 0.19.1; interface version 16001.
 - Last verified commit before the 0.15.0 publication: 77e5927 (Simplify README for addon users).
 - The user successfully published the addon previously.
 - No external addon dependencies and no build step.
@@ -78,6 +78,10 @@ it does not measure actual visibility when other addons interfere.
 
 ## Technical implementation
 
+- Version 0.19.1 installs chat-tab guards when HideMe's saved variables load, before login chat setup finishes. OnShow catches native SetShown paths in addition to the existing Show hook; a guarded SetAlpha hook keeps hidden tabs transparent during subsequent fades, including combat. The applied tab mode is retained until combat-deferred changes take effect. Off restores General's alpha and visibility while other tabs remain hidden. Existing 0.19.0 working-tree changes were preserved.
+
+- Version 0.19.0 includes MultiCastActionBarFrame in toolbars. The Forever source defines its action pages, selection flyout, summon and recall controls as children in Blizzard_ActionBar/Shared/MultiCastActionBarFrame.xml. The existing alpha-only target/combat handling, combat-deferred settings and late-addon discovery apply. TotemFrame is a separate player-frame duration display and is not an action bar. Health exceptions remain limited to action bars 1–8. In-game verification is pending.
+
 - fishing-bobber-tooltip: HideMeDB.hideFishingBobberTooltip. GameTooltip OnShow/OnUpdate hooks inspect the first line only for UIParent-owned world tooltips; secret text is skipped. Matches English Fishing Bobber, German Angelschwimmer, or FISHING_BOBBER if provided by the client. Other locales without that global are not yet supported. Mode changes and hook installation defer in combat; installed hooks enforce the applied mode. Off relies on the next normal mouseover and never forces stale tooltip content to show. Included in all/help/status and per-character persistence. The user confirmed basic functionality in game on October 16, 2026 with version 0.18.0; the full combat/persistence compatibility matrix remains pending.
 
 - day-night-indicator: HideMeDB.hideDayNightIndicator; MinimapCluster.DielFrame, discovered through GetTargetFrames. Confirmed in the forever branch's Blizzard_Minimap/Camelot/Diel.lua, where the frame contains both the cycle background and border. Uses generic Show/Hide and Show/SetShown enforcement, combat deferral, missing-frame retry and per-character persistence. Independent of GameTimeFrame and the minimap itself. Included automatically in all and status. The user confirmed on October 16, 2026 that version 0.17.0 works in game; the full combat/persistence compatibility matrix remains pending.
@@ -120,6 +124,10 @@ it does not measure actual visibility when other addons interfere.
 - Other addons can affect the same frames.
 
 ## Changes and verification
+
+- Version 0.19.1 passed Lua 5.1 simulations for saved on/off login, native-style SetShown bypassing Show, Show and alpha enforcement, combat-deferred on/off, General alpha restoration, other tabs remaining hidden, late tabs and all on/off. Existing totem-toolbar and permanent status-bar simulations and git diff --check passed. The user confirmed on October 21, 2026 that the login fix works in game; the full combat/persistence compatibility matrix remains pending.
+
+- Version 0.19.0 passed Lua 5.1 simulations for totem toolbar on/off, saved-only startup, target/combat transitions, combat-deferred settings, Show enforcement, late loading, absent class bars, inactive-bar preservation, invalid commands and all on/off. Existing permanent status-bar regression simulations and git diff --check passed. In-game verification is pending.
 
 - Version 0.18.0 passed Lua 5.1 simulations for fishing-bobber-tooltip default/saved startup, late loading, English/German/client-global names, unrelated tooltips, secret text, OnShow/OnUpdate, combat-deferred modes, invalid commands, all on/off, help and status. Day-night-indicator and permanent status-bar regressions passed. The user subsequently confirmed basic functionality in game on October 16, 2026. The full combat/persistence compatibility matrix remains pending.
 

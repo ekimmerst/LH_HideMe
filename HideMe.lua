@@ -2,6 +2,7 @@ local addonName = ...
 local events = CreateFrame("Frame")
 local hookedFrames = {}
 local hookedChatFunctions = {}
+local updatingChatTabAlpha = {}
 local combatLogFrames = {}
 local updatingCombatLogAlpha = {}
 local hidingCombatLog = false
@@ -99,6 +100,7 @@ local targets = {
             "MainActionBar", "MultiBarBottomLeft", "MultiBarBottomRight",
             "MultiBarRight", "MultiBarLeft", "MultiBar5", "MultiBar6", "MultiBar7",
             "PetActionBar", "StanceBar", "PossessActionBar", "OverrideActionBar",
+            "MultiCastActionBarFrame",
         },
         toolbars = true,
     },
@@ -136,7 +138,7 @@ local function PrintHelp()
     Print("/hideme player-frame off - Always show the player frame.")
     Print("/hideme targetauras on - Hide target buffs and debuffs.")
     Print("/hideme targetauras off - Show available target buffs and debuffs.")
-    Print("/hideme toolbars on - Show active action bars only with a target or in combat.")
+    Print("/hideme toolbars on - Show active action bars, including shaman totems, only with a target or in combat.")
     Print("/hideme toolbars off - Always show active action bars.")
     Print("/hideme except toolbar <1-8> - Also show this active bar below full health.")
     Print("/hideme except toolbar <1-8> off - Remove this exception.")
@@ -184,7 +186,7 @@ local function ShouldHide(target, frame)
     if target.chatTabs then
         -- Identify the default General window without relying on localized names.
         local generalTab = _G.ChatFrame1Tab or (_G.ChatFrame1 and _G.ChatFrame1.tab)
-        return HideMeDB and (HideMeDB[target.setting] or frame ~= generalTab)
+        return HideMeDB and (target.appliedHiding or frame ~= generalTab)
     end
     return HideMeDB and HideMeDB[target.setting]
         and (not target.conditional or not PlayerNeedsFrame())
@@ -498,11 +500,30 @@ local function ApplyTarget(target)
         return
     end
 
+    if target.chatTabs then target.appliedHiding = HideMeDB[target.setting] end
     local found = false
     for _, frame in ipairs(GetTargetFrames(target)) do
         if frame then
             found = true
             if not hookedFrames[frame] then
+                if target.chatTabs then
+                    local function EnforceTab(self)
+                        if not ShouldHide(target, self) then return end
+                        updatingChatTabAlpha[self] = true
+                        self:SetAlpha(0)
+                        updatingChatTabAlpha[self] = nil
+                        if InCombatLockdown() then
+                            target.pending = true
+                        else
+                            self:Hide()
+                        end
+                    end
+                    -- OnShow also catches native SetShown calls during chat setup.
+                    frame:HookScript("OnShow", EnforceTab)
+                    hooksecurefunc(frame, "SetAlpha", function(self)
+                        if not updatingChatTabAlpha[self] then EnforceTab(self) end
+                    end)
+                end
                 hooksecurefunc(frame, "Show", function(self)
                     if target.conditional and healthAlphaCurve then
                         UpdatePlayerAlpha(self, target)
@@ -528,6 +549,11 @@ local function ApplyTarget(target)
                 hookedFrames[frame] = true
             end
 
+            if target.chatTabs then
+                updatingChatTabAlpha[frame] = true
+                frame:SetAlpha(ShouldHide(target, frame) and 0 or 1)
+                updatingChatTabAlpha[frame] = nil
+            end
             if target.conditional then
                 target.appliedHiding = HideMeDB[target.setting]
                 -- The secure driver shows the protected frame during combat as well.
@@ -638,6 +664,8 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
             for number = 1, #toolbarNames do
                 HideMeDB.toolbarExceptions[number] = type(saved) == "table" and saved[number] == true
             end
+            -- Install tab guards before Blizzard finishes login chat setup.
+            ApplyTarget(targets["chat-tabs"])
         else
             ApplyTargets(true)
             -- Optional action bars may be loaded after the main UI.

@@ -1,6 +1,6 @@
 # HideMe
 
-Version: 0.18.0
+Version: 0.19.1
 
 Enjoy a cleaner interface with **HideMe** for the **WoW Forever Beta**. Hide the UI elements you do not need and keep your attention on the game. Choose each element individually or enable all hiding options with one command.
 
@@ -31,7 +31,7 @@ Use `/hideme <option> on` to enable hiding or `/hideme <option> off` to disable 
 | `micro-menu` | Hide the micro menu |
 | `player-frame` | Show the player frame only with a target, in combat, or below full health |
 | `targetauras` | Hide buffs and debuffs on the standard target frame |
-| `toolbars` | Show active standard action bars only with a target or in combat |
+| `toolbars` | Show active standard action bars, including shaman totem bars, only with a target or in combat |
 
 Type `/hideme status` to view your settings or `/hideme help` to see all commands.
 
@@ -44,6 +44,14 @@ With `chat-bar off`, the General chat input stays visible. With `chat-tabs off`,
 Place the **HideMe** folder in your game's `Interface/AddOns` folder, restart WoW, and enable **HideMe** in the addon list.
 
 ## Changelog
+
+### 0.19.1
+
+- Fixed the General chat tab reappearing after login while chat-tab hiding is enabled.
+
+### 0.19.0
+
+- Extended `toolbars` to include the shaman totem action bars, their selection menu, and the recall button. They appear with a target or in combat; use `toolbars off` to keep active bars visible.
 
 ### 0.18.0
 
