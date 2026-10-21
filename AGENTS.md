@@ -16,23 +16,23 @@
 - Public repository: https://github.com/ekimmerst/lh_hideme
 - Remote origin: https://github.com/ekimmerst/lh_hideme.git
 - Branch: main, without a remote tracking branch. Local commit history is preserved.
-- As of October 21, 2026: version 0.19.2; interface version 16001.
+- As of October 21, 2026: version 0.20.0; interface version 16001.
 - Last verified commit before the 0.15.0 publication: 77e5927 (Simplify README for addon users).
 - The user successfully published the addon previously.
-- No external addon dependencies and no build step.
+- Requires LH_Tweaks as the shared configuration host; no build step.
 
 ## Files
 
 - LH_HideMe.toc: metadata, version, interface version, and Lua load order.
-- LH_HideMe.lua: entire implementation.
-- Media/Icon.tga: 256x256 uncompressed 32-bit closed-eye addon-list texture, referenced by IconTexture in LH_HideMe.toc.
+- LH_HideMe.lua: visibility implementation and shared settings getters. Settings.lua: native settings subpage.
+- Media/Icon.tga: 256x256 uncompressed 32-bit LH addon-list texture identical to LH_Tweaks/Icon.tga, referenced by IconTexture in LH_HideMe.toc.
 - Media/Icon.png: original generated artwork.
 - README.md: concise English addon-page description, commands, installation, and a final Changelog section covering all commits from a player's perspective (user request on October 15, 2026). Keep it focused on players, in the style of a CurseForge listing; omit implementation details and test reports. Keep the changelog updated for future changes.
 - AGENTS.md: information for future work.
 
 ## Commands
 
-Controlled exclusively through chat, without a settings interface.
+Configured through Settings > AddOns > LH Tweaks > LH HideMe, or through the chat commands below.
 
 - /lh_hideme all on: set all supported hiding settings to on.
 - /lh_hideme all off: set all supported hiding settings to off.
@@ -202,3 +202,11 @@ it does not measure actual visibility when other addons interfere.
 - Native addon-list rendering requires in-game verification. Restart WoW after adding the new texture if /reload does not show it.
 
 - The addon now requires LH_Tweaks as its shared configuration host and load-order dependency. CurseForge releases must also declare the LH_Tweaks project as a required dependency.
+
+## Native settings and shared icon (0.20.0)
+
+- Settings.lua registers LH HideMe using LH_Tweaks:RegisterModule. Blizzard's native subcategory provides indentation and expansion under LH Tweaks. Thirteen hiding proxies and eight action bar exception proxies reuse the existing slash command implementation; the wrapper notifies the UI after every command, including early-return bulk and exception paths.
+- Defaults are false for all 21 proxies, so native category reset disables hiding and clears exceptions. Hide all/Show all preserve exceptions. Settings remain per character in LH_HideMeDB; existing visibility and combat deferral are retained.
+- TOC Title is LH HideMe; Group is LH_Tweaks (the exact parent folder identifier). The core TOC explicitly sets the same parent Group. This uses the native Forever AddonList grouping described in https://raw.githubusercontent.com/Gethe/wow-ui-source/forever/Interface/AddOns/Blizzard_AddOnList/AddonList.lua .
+- Media/Icon.png and Media/Icon.tga are exact copies of the LH_Tweaks icon, using Spoken's chamfered gold frame reference and LH lettering. The README documents this. Historical closed-eye notes above describe the replaced artwork.
+- .settings-test.py passes native module registration, all 21 settings, real visibility on/off, combat-deferred changes, slash/UI synchronization, scoped defaults, bulk exception preservation, saved values and byte-identical icons. Real in-game settings and grouping presentation remain pending. Restart WoW because the TOC gains Settings.lua and Group metadata.

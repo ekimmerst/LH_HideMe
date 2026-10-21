@@ -1,10 +1,20 @@
 # LH_HideMe
 
-Version: 0.19.2
+Version: 0.20.0
 
 Enjoy a cleaner interface with **LH_HideMe** for the **WoW Forever Beta**. Hide the UI elements you do not need and keep your attention on the game. Choose each element individually or enable all hiding options with one command.
 
 LH_HideMe can hide the bag bar, micro menu, experience and reputation bars, chat controls, and the minimap calendar icon, addon icon, and day-night indicator. When their hiding options are enabled, action bars appear with a target or in combat, and the player frame also appears whenever you are below full health.
+
+## Configuration
+
+Open **Settings > AddOns**, expand **LH Tweaks**, and select **LH HideMe**. The native settings page contains all 13 hiding options, grouped into Chat, Minimap, Interface and Conditional visibility, plus eight action bar health exceptions. Checked means hiding is enabled; tooltips explain the conditional behavior.
+
+**Hide all** and **Show all** change every hiding option while retaining action bar exceptions. The native **Defaults** button turns off all hiding options and clears all eight exceptions for this character. Defaults on the LH Tweaks core page does not reset LH HideMe. The General-only chat-tab behavior and permanent Combat Log hiding still apply when hiding is disabled.
+
+The settings page and chat commands use the same saved values. Changes made during combat take effect afterward.
+
+In the game's AddOn list, **LH HideMe** is grouped beneath **LH Tweaks** using Blizzard's native expandable grouping. Both addons use exactly the same LH icon: large gold letters in the chamfered gold frame style referenced from **Spoken**.
 
 ## Getting started
 
@@ -41,7 +51,7 @@ With `chat-bar off`, the General chat input stays visible. With `chat-tabs off`,
 
 ## Installation
 
-Place the **LH_HideMe** folder in your game's `Interface/AddOns` folder, restart WoW, and enable **LH_HideMe** in the addon list.
+Place the **LH_HideMe** folder in your game's `Interface/AddOns` folder, restart WoW, and enable **LH HideMe** under **LH Tweaks** in the addon list.
 
 ### Upgrading from HideMe
 
@@ -49,7 +59,18 @@ The addon and its chat command are now named **LH_HideMe** and `/lh_hideme`. Res
 
 To retain your settings, close WoW and back up each character's `WTF/Account/<account>/<realm>/<character>/SavedVariables/HideMe.lua` file. Copy it to `LH_HideMe.lua` in the same SavedVariables folder, then change the table name `HideMeDB` to `LH_HideMeDB` inside the copy. Migrate before first using the renamed addon; do not overwrite an existing `LH_HideMe.lua` containing settings you want to keep. Without migration, hiding options start disabled and can be configured with `/lh_hideme`.
 
+## Required core addon
+
+Install and enable **LH_Tweaks** alongside this addon. LH_Tweaks is the shared LiteHawk configuration host and must load first. CurseForge releases must list LH_Tweaks as a required dependency so the client installs it automatically.
+
 ## Changelog
+
+### 0.20.0
+
+- Added the LH HideMe settings subpage beneath LH Tweaks, with all hiding options, eight action bar health exceptions, bulk controls and Defaults.
+- Grouped LH HideMe beneath LH Tweaks in the AddOn list.
+- Replaced the old eye icon with the same LH artwork used by LH Tweaks, using Spoken's gold frame style.
+
 
 ### 0.19.2
 
@@ -150,7 +171,3 @@ To retain your settings, close WoW and back up each character's `WTF/Account/<ac
 - Added chat commands to hide or show the bag bar and micro menu.
 - Added `/lh_hideme help` and `/lh_hideme status`, including indicators for pending changes.
 - Saved settings per character across reloads and restarts, with combat-time changes applied after combat ends.
-
-## Required core addon
-
-Install and enable **LH_Tweaks** alongside this addon. LH_Tweaks is the shared LiteHawk configuration host and must load first. CurseForge releases must list LH_Tweaks as a required dependency so the client installs it automatically.

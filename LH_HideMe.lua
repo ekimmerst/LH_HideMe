@@ -22,6 +22,7 @@ if UnitHealthPercent and C_CurveUtil and C_CurveUtil.CreateCurve
     healthAlphaCurve:AddPoint(0, 1)
     healthAlphaCurve:AddPoint(1, 0)
 end
+
 local targets = {
     ["fishing-bobber-tooltip"] = {
         setting = "hideFishingBobberTooltip",
@@ -105,6 +106,17 @@ local targets = {
         toolbars = true,
     },
 }
+
+-- Shared settings access keeps the native page on the existing command path.
+LH_HideMe = { targets = targets }
+function LH_HideMe:GetOption(name)
+    local target = self.targets[name]
+    return target and LH_HideMeDB and LH_HideMeDB[target.setting] == true or false
+end
+function LH_HideMe:GetToolbarException(number)
+    return LH_HideMeDB and LH_HideMeDB.toolbarExceptions
+        and LH_HideMeDB.toolbarExceptions[number] == true or false
+end
 
 local function Print(message)
     DEFAULT_CHAT_FRAME:AddMessage("|cff66ccffLH_HideMe:|r " .. message)
