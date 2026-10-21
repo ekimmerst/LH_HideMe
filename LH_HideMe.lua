@@ -107,43 +107,43 @@ local targets = {
 }
 
 local function Print(message)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff66ccffHideMe:|r " .. message)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff66ccffLH_HideMe:|r " .. message)
 end
 
 local function PrintHelp()
     Print("Available commands (on: enable hiding, off: disable hiding):")
-    Print("/hideme all on - Set all supported hiding settings to on.")
-    Print("/hideme all off - Set all supported hiding settings to off.")
-    Print("/hideme addons-icon on - Hide the minimap addon compartment icon.")
-    Print("/hideme addons-icon off - Show the minimap addon compartment icon.")
-    Print("/hideme bag-bar on - Hide the bag bar.")
-    Print("/hideme bag-bar off - Show the bag bar.")
-    Print("/hideme calendar-icon on - Hide the minimap calendar icon.")
-    Print("/hideme calendar-icon off - Show the minimap calendar icon.")
-    Print("/hideme chat-bar on - Show chat input only while typing (press Return to start).")
-    Print("/hideme chat-bar off - Always show the General chat input without taking focus.")
-    Print("/hideme chat-buttons on - Hide standard chat buttons in all chat windows.")
-    Print("/hideme chat-buttons off - Show standard chat buttons.")
-    Print("/hideme chat-tabs on - Hide all standard chat tabs.")
-    Print("/hideme chat-tabs off - Show only the General tab.")
-    Print("/hideme day-night-indicator on - Hide the minimap day-night indicator.")
-    Print("/hideme day-night-indicator off - Show the minimap day-night indicator.")
-    Print("/hideme exp-bar on - Hide all status bars and borders permanently.")
-    Print("/hideme exp-bar off - Always show available status bars and borders.")
-    Print("/hideme fishing-bobber-tooltip on - Hide the fishing bobber tooltip.")
-    Print("/hideme fishing-bobber-tooltip off - Show the fishing bobber tooltip normally.")
-    Print("/hideme micro-menu on - Hide the micro menu.")
-    Print("/hideme micro-menu off - Show the micro menu.")
-    Print("/hideme player-frame on - Show with a target, in combat, or below full health.")
-    Print("/hideme player-frame off - Always show the player frame.")
-    Print("/hideme targetauras on - Hide target buffs and debuffs.")
-    Print("/hideme targetauras off - Show available target buffs and debuffs.")
-    Print("/hideme toolbars on - Show active action bars, including shaman totems, only with a target or in combat.")
-    Print("/hideme toolbars off - Always show active action bars.")
-    Print("/hideme except toolbar <1-8> - Also show this active bar below full health.")
-    Print("/hideme except toolbar <1-8> off - Remove this exception.")
-    Print("/hideme status - Show saved settings for all supported elements.")
-    Print("/hideme help - Show this help.")
+    Print("/lh_hideme all on - Set all supported hiding settings to on.")
+    Print("/lh_hideme all off - Set all supported hiding settings to off.")
+    Print("/lh_hideme addons-icon on - Hide the minimap addon compartment icon.")
+    Print("/lh_hideme addons-icon off - Show the minimap addon compartment icon.")
+    Print("/lh_hideme bag-bar on - Hide the bag bar.")
+    Print("/lh_hideme bag-bar off - Show the bag bar.")
+    Print("/lh_hideme calendar-icon on - Hide the minimap calendar icon.")
+    Print("/lh_hideme calendar-icon off - Show the minimap calendar icon.")
+    Print("/lh_hideme chat-bar on - Show chat input only while typing (press Return to start).")
+    Print("/lh_hideme chat-bar off - Always show the General chat input without taking focus.")
+    Print("/lh_hideme chat-buttons on - Hide standard chat buttons in all chat windows.")
+    Print("/lh_hideme chat-buttons off - Show standard chat buttons.")
+    Print("/lh_hideme chat-tabs on - Hide all standard chat tabs.")
+    Print("/lh_hideme chat-tabs off - Show only the General tab.")
+    Print("/lh_hideme day-night-indicator on - Hide the minimap day-night indicator.")
+    Print("/lh_hideme day-night-indicator off - Show the minimap day-night indicator.")
+    Print("/lh_hideme exp-bar on - Hide all status bars and borders permanently.")
+    Print("/lh_hideme exp-bar off - Always show available status bars and borders.")
+    Print("/lh_hideme fishing-bobber-tooltip on - Hide the fishing bobber tooltip.")
+    Print("/lh_hideme fishing-bobber-tooltip off - Show the fishing bobber tooltip normally.")
+    Print("/lh_hideme micro-menu on - Hide the micro menu.")
+    Print("/lh_hideme micro-menu off - Show the micro menu.")
+    Print("/lh_hideme player-frame on - Show with a target, in combat, or below full health.")
+    Print("/lh_hideme player-frame off - Always show the player frame.")
+    Print("/lh_hideme targetauras on - Hide target buffs and debuffs.")
+    Print("/lh_hideme targetauras off - Show available target buffs and debuffs.")
+    Print("/lh_hideme toolbars on - Show active action bars, including shaman totems, only with a target or in combat.")
+    Print("/lh_hideme toolbars off - Always show active action bars.")
+    Print("/lh_hideme except toolbar <1-8> - Also show this active bar below full health.")
+    Print("/lh_hideme except toolbar <1-8> off - Remove this exception.")
+    Print("/lh_hideme status - Show saved settings for all supported elements.")
+    Print("/lh_hideme help - Show this help.")
 end
 
 local function PrintStatus()
@@ -156,7 +156,7 @@ local function PrintStatus()
 
     for _, name in ipairs(names) do
         local target = targets[name]
-        local hidden = HideMeDB and HideMeDB[target.setting] == true
+        local hidden = LH_HideMeDB and LH_HideMeDB[target.setting] == true
         local state = hidden and "on (hiding enabled)" or "off (hiding disabled)"
         if target.chatTabs then
             state = hidden and "on (all tabs hidden)" or "off (General tab only)"
@@ -171,7 +171,7 @@ local function PrintStatus()
         Print(name .. " - " .. target.label .. ": " .. state)
     end
     for number = 1, #toolbarNames do
-        if HideMeDB and HideMeDB.toolbarExceptions and HideMeDB.toolbarExceptions[number] then
+        if LH_HideMeDB and LH_HideMeDB.toolbarExceptions and LH_HideMeDB.toolbarExceptions[number] then
             Print("except toolbar " .. number .. " - Also visible below full health"
                 .. (targets.toolbars.pending and " - Pending toolbar update" or ""))
         end
@@ -186,9 +186,9 @@ local function ShouldHide(target, frame)
     if target.chatTabs then
         -- Identify the default General window without relying on localized names.
         local generalTab = _G.ChatFrame1Tab or (_G.ChatFrame1 and _G.ChatFrame1.tab)
-        return HideMeDB and (target.appliedHiding or frame ~= generalTab)
+        return LH_HideMeDB and (target.appliedHiding or frame ~= generalTab)
     end
-    return HideMeDB and HideMeDB[target.setting]
+    return LH_HideMeDB and LH_HideMeDB[target.setting]
         and (not target.conditional or not PlayerNeedsFrame())
 end
 
@@ -219,11 +219,11 @@ end
 local function ApplyToolbars(target)
     local combat = InCombatLockdown()
     if not combat then
-        target.appliedHiding = HideMeDB[target.setting]
+        target.appliedHiding = LH_HideMeDB[target.setting]
         target.appliedExceptions = {}
         for number = 1, #toolbarNames do
-            target.appliedExceptions[number] = HideMeDB.toolbarExceptions
-                and HideMeDB.toolbarExceptions[number] == true or false
+            target.appliedExceptions[number] = LH_HideMeDB.toolbarExceptions
+                and LH_HideMeDB.toolbarExceptions[number] == true or false
         end
     end
     local found = false
@@ -270,7 +270,7 @@ end
 local function ApplyExperience(target)
     local combat = InCombatLockdown()
     if not combat then
-        target.appliedHiding = HideMeDB[target.setting]
+        target.appliedHiding = LH_HideMeDB[target.setting]
     end
     local frames = GetExperienceFrames(target)
     for _, frame in ipairs(frames) do
@@ -350,16 +350,16 @@ local function ApplyChatInput(target)
         if not hookedFrames[frame] then
             -- Never hide from a Show hook: Blizzard shows the box before focusing it.
             frame:HookScript("OnEditFocusLost", function(self)
-                if not HideMeDB then return end
+                if not LH_HideMeDB then return end
                 if InCombatLockdown() then
                     target.pending = true
-                elseif HideMeDB[target.setting] then
+                elseif LH_HideMeDB[target.setting] then
                     self:Hide()
                 end
             end)
             hooksecurefunc(frame, "Hide", function(self)
                 local general = _G.ChatFrame1EditBox or (_G.ChatFrame1 and _G.ChatFrame1.editBox)
-                if HideMeDB and not HideMeDB[target.setting] and self == general then
+                if LH_HideMeDB and not LH_HideMeDB[target.setting] and self == general then
                     if InCombatLockdown() then
                         target.pending = true
                     else
@@ -371,7 +371,7 @@ local function ApplyChatInput(target)
             hookedFrames[frame] = true
         end
         if not frame:HasFocus() then
-            if not HideMeDB[target.setting] and frame == primary then
+            if not LH_HideMeDB[target.setting] and frame == primary then
                 frame:Show()
             else
                 frame:Hide()
@@ -384,7 +384,7 @@ end
 
 local function ApplyTargetAuras(target)
     local combat = InCombatLockdown()
-    if not combat then target.appliedHiding = HideMeDB[target.setting] end
+    if not combat then target.appliedHiding = LH_HideMeDB[target.setting] end
     local found = false
     local function Update(frame)
         updatingAuraAlpha[frame] = true
@@ -420,7 +420,7 @@ local function ApplyTargetAuras(target)
     if not combat then
         if type(_G.TargetFrame_UpdateAuras) == "function" and not hookedAuraFunctions.legacy then
             hooksecurefunc("TargetFrame_UpdateAuras", function(self)
-                if self == _G.TargetFrame and HideMeDB then ApplyTargetAuras(target) end
+                if self == _G.TargetFrame and LH_HideMeDB then ApplyTargetAuras(target) end
             end)
             hookedAuraFunctions.legacy = true
         end
@@ -430,7 +430,7 @@ local function ApplyTargetAuras(target)
                 if type(frame[method]) == "function" and not hookedAuraFunctions[frame][method] then
                     -- Classic creates named buttons inside UpdateAuras, after our event may run.
                     hooksecurefunc(frame, method, function()
-                        if HideMeDB then ApplyTargetAuras(target) end
+                        if LH_HideMeDB then ApplyTargetAuras(target) end
                     end)
                     hookedAuraFunctions[frame][method] = true
                 end
@@ -467,7 +467,7 @@ local function ApplyFishingBobberTooltip(target)
         target.pending = true
         return false
     end
-    target.appliedHiding = HideMeDB[target.setting]
+    target.appliedHiding = LH_HideMeDB[target.setting]
     if not hookedBobberTooltips[tooltip] then
         -- OnUpdate also catches content changes while the tooltip stays shown.
         tooltip:HookScript("OnShow", function(self) HideFishingBobberTooltip(self, target) end)
@@ -500,7 +500,7 @@ local function ApplyTarget(target)
         return
     end
 
-    if target.chatTabs then target.appliedHiding = HideMeDB[target.setting] end
+    if target.chatTabs then target.appliedHiding = LH_HideMeDB[target.setting] end
     local found = false
     for _, frame in ipairs(GetTargetFrames(target)) do
         if frame then
@@ -555,9 +555,9 @@ local function ApplyTarget(target)
                 updatingChatTabAlpha[frame] = nil
             end
             if target.conditional then
-                target.appliedHiding = HideMeDB[target.setting]
+                target.appliedHiding = LH_HideMeDB[target.setting]
                 -- The secure driver shows the protected frame during combat as well.
-                local driver = not healthAlphaCurve and HideMeDB[target.setting]
+                local driver = not healthAlphaCurve and LH_HideMeDB[target.setting]
                     and "[combat] show; [@target,exists] show; hide" or "show"
                 RegisterStateDriver(frame, "visibility", driver)
             end
@@ -614,7 +614,7 @@ local function HideCombatLog()
 end
 
 local function ApplyTargets(pendingOnly)
-    if not HideMeDB then return end
+    if not LH_HideMeDB then return end
     for _, target in pairs(targets) do
         if not pendingOnly or target.pending then
             ApplyTarget(target)
@@ -625,7 +625,7 @@ local function ApplyTargets(pendingOnly)
         for _, name in ipairs({ "FCF_OpenNewWindow", "FCF_OpenTemporaryWindow" }) do
             if type(_G[name]) == "function" and not hookedChatFunctions[name] then
                 hooksecurefunc(name, function()
-                    if HideMeDB then
+                    if LH_HideMeDB then
                         ApplyTarget(targets["chat-buttons"])
                         ApplyTarget(targets["chat-tabs"])
                         ApplyTarget(targets["chat-bar"])
@@ -653,33 +653,33 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
     HideCombatLog()
     if event == "ADDON_LOADED" then
         if loadedAddon == addonName then
-            if type(HideMeDB) ~= "table" then
-                HideMeDB = {}
+            if type(LH_HideMeDB) ~= "table" then
+                LH_HideMeDB = {}
             end
             for _, target in pairs(targets) do
-                HideMeDB[target.setting] = HideMeDB[target.setting] == true
+                LH_HideMeDB[target.setting] = LH_HideMeDB[target.setting] == true
             end
-            local saved = HideMeDB.toolbarExceptions
-            HideMeDB.toolbarExceptions = {}
+            local saved = LH_HideMeDB.toolbarExceptions
+            LH_HideMeDB.toolbarExceptions = {}
             for number = 1, #toolbarNames do
-                HideMeDB.toolbarExceptions[number] = type(saved) == "table" and saved[number] == true
+                LH_HideMeDB.toolbarExceptions[number] = type(saved) == "table" and saved[number] == true
             end
             -- Install tab guards before Blizzard finishes login chat setup.
             ApplyTarget(targets["chat-tabs"])
         else
             ApplyTargets(true)
             -- Optional action bars may be loaded after the main UI.
-            if HideMeDB then ApplyTarget(targets["toolbars"]) end
-            if HideMeDB then ApplyTarget(targets["exp-bar"]) end
-            if HideMeDB then ApplyTarget(targets["chat-buttons"]) end
-            if HideMeDB then ApplyTarget(targets["chat-tabs"]) end
-            if HideMeDB then ApplyTarget(targets["chat-bar"]) end
-            if HideMeDB then ApplyTarget(targets.targetauras) end
+            if LH_HideMeDB then ApplyTarget(targets["toolbars"]) end
+            if LH_HideMeDB then ApplyTarget(targets["exp-bar"]) end
+            if LH_HideMeDB then ApplyTarget(targets["chat-buttons"]) end
+            if LH_HideMeDB then ApplyTarget(targets["chat-tabs"]) end
+            if LH_HideMeDB then ApplyTarget(targets["chat-bar"]) end
+            if LH_HideMeDB then ApplyTarget(targets.targetauras) end
         end
     elseif event == "UNIT_AURA" then
-        if loadedAddon == "target" and HideMeDB then ApplyTargetAuras(targets.targetauras) end
+        if loadedAddon == "target" and LH_HideMeDB then ApplyTargetAuras(targets.targetauras) end
     elseif event == "UPDATE_CHAT_WINDOWS" or event == "UPDATE_FLOATING_CHAT_WINDOWS" then
-        if HideMeDB then
+        if LH_HideMeDB then
             ApplyTarget(targets["chat-buttons"])
             ApplyTarget(targets["chat-tabs"])
             ApplyTarget(targets["chat-bar"])
@@ -687,7 +687,7 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
         end
     elseif event == "PLAYER_REGEN_DISABLED" or event == "PLAYER_TARGET_CHANGED"
         or event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
-        if HideMeDB and (event ~= "UNIT_HEALTH" and event ~= "UNIT_MAXHEALTH"
+        if LH_HideMeDB and (event ~= "UNIT_HEALTH" and event ~= "UNIT_MAXHEALTH"
             or loadedAddon == "player") then
             ApplyTarget(targets["player-frame"])
             ApplyTarget(targets["toolbars"])
@@ -695,14 +695,14 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
         end
     else
         ApplyTargets(event == "PLAYER_REGEN_ENABLED")
-        if event == "PLAYER_REGEN_ENABLED" and HideMeDB then
+        if event == "PLAYER_REGEN_ENABLED" and LH_HideMeDB then
             ApplyTarget(targets["player-frame"])
         end
     end
 end)
 
-SLASH_HIDEME1 = "/hideme"
-SlashCmdList.HIDEME = function(message)
+SLASH_LH_HIDEME1 = "/lh_hideme"
+SlashCmdList.LH_HIDEME = function(message)
     message = message:lower():match("^%s*(.-)%s*$")
     if message == "help" or message == "" then
         PrintHelp()
@@ -721,12 +721,12 @@ SlashCmdList.HIDEME = function(message)
             mode = ""
         end
         if not number or (mode ~= "" and mode ~= "off") then
-            Print("Invalid command. Use /hideme except toolbar <1-8> [off].")
+            Print("Invalid command. Use /lh_hideme except toolbar <1-8> [off].")
             return
         end
         number = tonumber(number)
-        HideMeDB.toolbarExceptions = HideMeDB.toolbarExceptions or {}
-        HideMeDB.toolbarExceptions[number] = mode ~= "off"
+        LH_HideMeDB.toolbarExceptions = LH_HideMeDB.toolbarExceptions or {}
+        LH_HideMeDB.toolbarExceptions[number] = mode ~= "off"
         ApplyToolbars(targets.toolbars)
         local text = "Toolbar " .. number .. " health exception " .. (mode == "off" and "removed." or "saved.")
         if InCombatLockdown() then
@@ -745,14 +745,14 @@ SlashCmdList.HIDEME = function(message)
     local name, mode = message:match("^%s*(%S+)%s+(%S+)%s*$")
     local target = targets[name]
     if (not target and name ~= "all") or (mode ~= "on" and mode ~= "off") then
-        Print("Invalid command. For usage and available parameters, type /hideme help")
+        Print("Invalid command. For usage and available parameters, type /lh_hideme help")
         return
     end
 
     if name == "all" then
         -- Save every mode before applying frames so hooks see consistent settings.
         for _, entry in pairs(targets) do
-            HideMeDB[entry.setting] = mode == "on"
+            LH_HideMeDB[entry.setting] = mode == "on"
         end
         ApplyTargets()
         local pending = false
@@ -769,27 +769,27 @@ SlashCmdList.HIDEME = function(message)
         return
     end
 
-    HideMeDB[target.setting] = mode == "on"
+    LH_HideMeDB[target.setting] = mode == "on"
     local found = ApplyTarget(target)
     HideCombatLog()
-    local action = HideMeDB[target.setting] and "hidden." or "shown."
+    local action = LH_HideMeDB[target.setting] and "hidden." or "shown."
     if target.conditional then
-        action = HideMeDB[target.setting]
+        action = LH_HideMeDB[target.setting]
             and (healthAlphaCurve and "shown with a target, in combat, or below full health."
                 or "shown only with a target or in combat (health API unavailable).")
             or "always shown."
     elseif target.chatInput then
-        action = HideMeDB[target.setting]
+        action = LH_HideMeDB[target.setting]
             and "shown only while typing (press Return to start)."
             or "always shown for the General window without taking focus."
     elseif target.chatTabs then
-        action = HideMeDB[target.setting] and "all hidden." or "shown only for the General window."
+        action = LH_HideMeDB[target.setting] and "all hidden." or "shown only for the General window."
     elseif target.toolbars then
-        action = HideMeDB[target.setting]
+        action = LH_HideMeDB[target.setting]
             and "shown only with a target or in combat."
             or "always shown when active."
     elseif target.experience then
-        action = HideMeDB[target.setting]
+        action = LH_HideMeDB[target.setting]
             and "hidden permanently."
             or "always shown when available."
     end

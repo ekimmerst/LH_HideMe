@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: LH_HideMe
+## IconTexture: Interface\AddOns\LH_HideMe\Media\Icon
+## Notes: Hides and shows UI elements using chat commands.
+## Author: LH_HideMe
+## Version: 0.19.2
+## SavedVariablesPerCharacter: LH_HideMeDB
+
+LH_HideMe.lua

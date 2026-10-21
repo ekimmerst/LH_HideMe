@@ -1,9 +1,0 @@
-## Interface: 16001
-## Title: HideMe
-## IconTexture: Interface\AddOns\HideMe\Media\Icon
-## Notes: Hides and shows UI elements using chat commands.
-## Author: HideMe
-## Version: 0.19.1
-## SavedVariablesPerCharacter: HideMeDB
-
-HideMe.lua
