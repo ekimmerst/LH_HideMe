@@ -200,3 +200,5 @@ it does not measure actual visibility when other addons interfere.
 - Generated with the built-in image_gen tool, then converted to a 256x256 uncompressed BGRA TGA with top-left origin.
 - IconTexture points to Interface\AddOns\LH_HideMe\Media\Icon (extension omitted). Keep Media when installing.
 - Native addon-list rendering requires in-game verification. Restart WoW after adding the new texture if /reload does not show it.
+
+- The addon now requires LH_Tweaks as its shared configuration host and load-order dependency. CurseForge releases must also declare the LH_Tweaks project as a required dependency.

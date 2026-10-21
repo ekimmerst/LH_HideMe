@@ -150,3 +150,7 @@ To retain your settings, close WoW and back up each character's `WTF/Account/<ac
 - Added chat commands to hide or show the bag bar and micro menu.
 - Added `/lh_hideme help` and `/lh_hideme status`, including indicators for pending changes.
 - Saved settings per character across reloads and restarts, with combat-time changes applied after combat ends.
+
+## Required core addon
+
+Install and enable **LH_Tweaks** alongside this addon. LH_Tweaks is the shared LiteHawk configuration host and must load first. CurseForge releases must list LH_Tweaks as a required dependency so the client installs it automatically.
