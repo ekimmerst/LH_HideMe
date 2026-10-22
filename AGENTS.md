@@ -13,9 +13,9 @@
 
 - Small Lua addon for the WoW Forever Beta.
 - Folder: C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\LH_HideMe
-- Public repository: https://github.com/ekimmerst/lh_hideme
-- Remote origin: https://github.com/ekimmerst/lh_hideme.git
-- Branch: main, without a remote tracking branch. Local commit history is preserved.
+- Public repository: https://github.com/ekimmerst/LH_HideMe
+- Remote origin: https://github.com/ekimmerst/LH_HideMe.git
+- Branch: main, tracking origin/main. Local commit history is preserved.
 - As of October 21, 2026: version 0.20.0; interface version 16001.
 - Last verified commit before the 0.15.0 publication: 77e5927 (Simplify README for addon users).
 - The user successfully published the addon previously.
