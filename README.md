@@ -1,5 +1,7 @@
 <h1 style="color: #d9a94b;">LH HideMe</h1>
 
+<p>Hide selected parts of the default WoW UI, including chat controls, minimap buttons, action bars, and frames, with individual settings or a Hide all option.</p>
+
 <p>Keep the familiar WoW interface, but clear away the pieces you don't need to see all the time. LH HideMe gives you individual controls for common UI elements and brings important frames back when you need them.</p>
 
 <h2 style="color: #73c9c4;">What it can hide</h2>
