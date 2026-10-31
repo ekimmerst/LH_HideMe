@@ -46,15 +46,14 @@
 
 <p><strong>LH Tweaks is required</strong> and must be installed alongside LH HideMe. I made this for my own UI first, but I hope you can make it yours too. Please post feedback, bugs and improvement ideas in the CurseForge comments.</p>
 
-<hr>
-<p><sup>*</sup> Implemented with the help of Codex and GPT-6-SOL and tested by me as thoroughly as I could in the WoW beta client. Some class or race combinations may still need work; please report anything you notice.</p>
-
 <h2 style="color: #73c9c4;">Changelog</h2>
 
+<p><strong>0.20.1 - Forever</strong></p>
+
 <ul>
-  <li><strong>0.20.1:</strong> Added an independent option to hide main action bar artwork. Hiding chat tabs now leaves whisper and other tabs under the game's normal control.</li>
-  <li><strong>0.20.0:</strong> Added a dedicated page beneath LH Tweaks for every hiding option and action bar health exceptions.</li>
-  <li><strong>Recent updates:</strong> Added fishing bobber tooltip, day/night indicator and target aura controls; improved chat tab hiding after login and included shaman totem bars.</li>
-  <li><strong>Visibility controls:</strong> Added action bar health exceptions, Hide all and Show all, permanent status bar hiding, and addon menu and calendar icon switches.</li>
-  <li><strong>Earlier updates:</strong> Added chat button and tab controls, conditional player frame and action bar visibility, and independent switches for the bag bar and micro menu.</li>
+  <li>Added a separate switch for the main action bar border and gryphons.</li>
+  <li>Hiding chat tabs now leaves whisper and other temporary tabs under Blizzard's control.</li>
 </ul>
+
+<hr>
+<p><sup>*</sup> Implemented with the help of Codex and GPT-6-SOL. Some class or race combinations may still need work; please report anything you notice.</p>
