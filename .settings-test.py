@@ -13,6 +13,9 @@ function M:SetAlpha(v) self.alpha=v end
 function UnitExists() return false end
 BagsBar=CreateFrame('Frame',nil,UIParent)
 MainActionBar=CreateFrame('Frame',nil,UIParent)
+MainActionBar.EndCaps=CreateFrame('Frame',nil,MainActionBar)
+MainActionBar.BorderArt=CreateFrame('Frame',nil,MainActionBar)
+ActionButton1=CreateFrame('Button',nil,MainActionBar)
 LH_HideMeDB={hideBagBar=true,toolbarExceptions={[2]=true}}
 combat=false
 ''')
@@ -32,7 +35,20 @@ for variable,setting in pairs(registry) do
   count=count+1
  end
 end
-assert(count==21,'Expected 13 hiding options and 8 health exceptions')
+assert(count==22,'Expected 14 hiding options and 8 health exceptions')
+-- Forever bar artwork is independent of the action buttons and other bars.
+registry.LH_HideMe_bar_artwork.set(true)
+for _,region in ipairs({MainActionBar.EndCaps,MainActionBar.BorderArt}) do assert(region.alpha==0) end
+assert(ActionButton1.alpha==nil and MainActionBar.alpha==1)
+MainActionBar.EndCaps:SetAlpha(1)
+assert(MainActionBar.EndCaps.alpha==0)
+registry.LH_HideMe_bar_artwork.set(false)
+for _,region in ipairs({MainActionBar.EndCaps,MainActionBar.BorderArt}) do assert(region.alpha==1) end
+combat=true;registry.LH_HideMe_bar_artwork.set(true)
+assert(MainActionBar.EndCaps.alpha==1 and LH_HideMeDB.hideBarArtwork)
+combat=false;hideEvent.scripts.OnEvent(hideEvent,'PLAYER_REGEN_ENABLED')
+assert(MainActionBar.EndCaps.alpha==0)
+registry.LH_HideMe_bar_artwork.set(false)
 -- UI calls the existing secure/deferred visibility implementation.
 registry.LH_HideMe_bag_bar.set(true);assert(not BagsBar.shown)
 registry.LH_HideMe_bag_bar.set(false);assert(BagsBar.shown)
@@ -61,4 +77,4 @@ assert(SettingsPanel.list.Header.Title.text=='LH HideMe')
 ''')
 assert (addon / 'Media/Icon.tga').read_bytes() == (core / 'Icon.tga').read_bytes()
 assert (addon / 'Media/Icon.png').read_bytes() == (core / 'Icon.png').read_bytes()
-print('PASS: nested module category, all 21 controls, visibility and combat deferral, command/UI synchronization, scoped defaults, bulk preservation, saved settings and identical icons')
+print('PASS: nested module category, all 22 controls, artwork isolation and combat deferral, command/UI synchronization, scoped defaults, bulk preservation, saved settings and identical icons')

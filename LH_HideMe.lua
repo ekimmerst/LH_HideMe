@@ -7,6 +7,7 @@ local combatLogFrames = {}
 local updatingCombatLogAlpha = {}
 local hidingCombatLog = false
 local updatingExperienceAlpha = {}
+local updatingArtworkAlpha = {}
 local auraFrames = {}
 local updatingAuraAlpha = {}
 local hookedAuraFunctions = {}
@@ -24,6 +25,11 @@ if UnitHealthPercent and C_CurveUtil and C_CurveUtil.CreateCurve
 end
 
 local targets = {
+    ["bar-artwork"] = {
+        setting = "hideBarArtwork",
+        label = "Action bar artwork",
+        artwork = true,
+    },
     ["fishing-bobber-tooltip"] = {
         setting = "hideFishingBobberTooltip",
         label = "Fishing bobber tooltip",
@@ -130,14 +136,16 @@ local function PrintHelp()
     Print("/lh_hideme addons-icon off - Show the minimap addon compartment icon.")
     Print("/lh_hideme bag-bar on - Hide the bag bar.")
     Print("/lh_hideme bag-bar off - Show the bag bar.")
+    Print("/lh_hideme bar-artwork on - Hide the main bar border and gryphons.")
+    Print("/lh_hideme bar-artwork off - Restore the main bar artwork.")
     Print("/lh_hideme calendar-icon on - Hide the minimap calendar icon.")
     Print("/lh_hideme calendar-icon off - Show the minimap calendar icon.")
     Print("/lh_hideme chat-bar on - Show chat input only while typing (press Return to start).")
     Print("/lh_hideme chat-bar off - Always show the General chat input without taking focus.")
     Print("/lh_hideme chat-buttons on - Hide standard chat buttons in all chat windows.")
     Print("/lh_hideme chat-buttons off - Show standard chat buttons.")
-    Print("/lh_hideme chat-tabs on - Hide all standard chat tabs.")
-    Print("/lh_hideme chat-tabs off - Show only the General tab.")
+    Print("/lh_hideme chat-tabs on - Hide the General and Combat Log tabs.")
+    Print("/lh_hideme chat-tabs off - Show the General tab; Combat Log stays hidden.")
     Print("/lh_hideme day-night-indicator on - Hide the minimap day-night indicator.")
     Print("/lh_hideme day-night-indicator off - Show the minimap day-night indicator.")
     Print("/lh_hideme exp-bar on - Hide all status bars and borders permanently.")
@@ -171,7 +179,7 @@ local function PrintStatus()
         local hidden = LH_HideMeDB and LH_HideMeDB[target.setting] == true
         local state = hidden and "on (hiding enabled)" or "off (hiding disabled)"
         if target.chatTabs then
-            state = hidden and "on (all tabs hidden)" or "off (General tab only)"
+            state = hidden and "on (General and Combat Log hidden)" or "off (General shown; Combat Log hidden)"
         end
         if target.pending then
             if InCombatLockdown() then
@@ -198,7 +206,7 @@ local function ShouldHide(target, frame)
     if target.chatTabs then
         -- Identify the default General window without relying on localized names.
         local generalTab = _G.ChatFrame1Tab or (_G.ChatFrame1 and _G.ChatFrame1.tab)
-        return LH_HideMeDB and (target.appliedHiding or frame ~= generalTab)
+        return LH_HideMeDB and target.appliedHiding and frame == generalTab
     end
     return LH_HideMeDB and LH_HideMeDB[target.setting]
         and (not target.conditional or not PlayerNeedsFrame())
@@ -303,6 +311,45 @@ local function ApplyExperience(target)
     return #frames > 0
 end
 
+local function GetArtworkRegions()
+    local regions = {}
+    local function Add(region)
+        if region then regions[#regions + 1] = region end
+    end
+    -- Forever exposes the artwork as regions of its main action bar.
+    local mainBar = _G.MainActionBar
+    if mainBar then
+        Add(mainBar.EndCaps)
+        Add(mainBar.BorderArt)
+    end
+    return regions
+end
+
+local function UpdateArtworkAlpha(region, target)
+    updatingArtworkAlpha[region] = true
+    region:SetAlpha(target.appliedHiding and 0 or 1)
+    updatingArtworkAlpha[region] = nil
+end
+
+local function ApplyArtwork(target)
+    local combat = InCombatLockdown()
+    if not combat then target.appliedHiding = LH_HideMeDB[target.setting] end
+    local regions = GetArtworkRegions()
+    for _, region in ipairs(regions) do
+        if not combat then UpdateArtworkAlpha(region, target) end
+        if not hookedFrames[region] and not combat then
+            hooksecurefunc(region, "SetAlpha", function(self)
+                if target.appliedHiding and not updatingArtworkAlpha[self] then
+                    UpdateArtworkAlpha(self, target)
+                end
+            end)
+            hookedFrames[region] = true
+        end
+    end
+    target.pending = combat or #regions == 0
+    return #regions > 0
+end
+
 local function GetTargetFrames(target)
     local frames, seen = {}, {}
     local function Add(frame)
@@ -312,6 +359,11 @@ local function GetTargetFrames(target)
         end
     end
     for _, name in ipairs(target.frames) do Add(_G[name]) end
+    if target.chatTabs then
+        -- Other chat tabs, including whispers, retain Blizzard's visibility.
+        Add(_G.ChatFrame1Tab or (_G.ChatFrame1 and _G.ChatFrame1.tab))
+        return frames
+    end
     if target.dayNightIndicator then
         Add(_G.MinimapCluster and _G.MinimapCluster.DielFrame)
     end
@@ -322,7 +374,7 @@ local function GetTargetFrames(target)
             Add(_G[name])
         end
     end
-    if target.chatButtons or target.chatTabs or target.chatInput then
+    if target.chatButtons or target.chatInput then
         local names = {}
         for i = 1, NUM_CHAT_WINDOWS or 10 do names[#names + 1] = "ChatFrame" .. i end
         for _, name in ipairs(CHAT_FRAMES or {}) do names[#names + 1] = name end
@@ -331,10 +383,6 @@ local function GetTargetFrames(target)
                 Add(_G[name .. "EditBox"])
                 local chat = _G[name]
                 if chat then Add(chat.editBox) end
-            elseif target.chatTabs then
-                Add(_G[name .. "Tab"])
-                local chat = _G[name]
-                if chat then Add(chat.tab) end
             else
                 Add(_G[name .. "ButtonFrame"])
                 Add(_G[name .. "ScrollToBottomButton"])
@@ -493,6 +541,7 @@ local function ApplyFishingBobberTooltip(target)
 end
 
 local function ApplyTarget(target)
+    if target.artwork then return ApplyArtwork(target) end
     if target.fishingBobberTooltip then return ApplyFishingBobberTooltip(target) end
     if target.targetAuras then return ApplyTargetAuras(target) end
     if target.chatInput then
@@ -683,6 +732,7 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
             -- Optional action bars may be loaded after the main UI.
             if LH_HideMeDB then ApplyTarget(targets["toolbars"]) end
             if LH_HideMeDB then ApplyTarget(targets["exp-bar"]) end
+            if LH_HideMeDB then ApplyTarget(targets["bar-artwork"]) end
             if LH_HideMeDB then ApplyTarget(targets["chat-buttons"]) end
             if LH_HideMeDB then ApplyTarget(targets["chat-tabs"]) end
             if LH_HideMeDB then ApplyTarget(targets["chat-bar"]) end
@@ -795,7 +845,9 @@ SlashCmdList.LH_HIDEME = function(message)
             and "shown only while typing (press Return to start)."
             or "always shown for the General window without taking focus."
     elseif target.chatTabs then
-        action = LH_HideMeDB[target.setting] and "all hidden." or "shown only for the General window."
+        action = LH_HideMeDB[target.setting]
+            and "hidden for General and Combat Log; other tabs follow the game."
+            or "shown for General; Combat Log stays hidden and other tabs follow the game."
     elseif target.toolbars then
         action = LH_HideMeDB[target.setting]
             and "shown only with a target or in combat."

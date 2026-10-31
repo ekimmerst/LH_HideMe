@@ -7,9 +7,9 @@
 <h2 style="color: #73c9c4;">What it can hide</h2>
 
 <ul>
-  <li><strong>Chat:</strong> Idle chat input, chat buttons and scroll controls, and chat tabs.</li>
+  <li><strong>Chat:</strong> Idle chat input, chat buttons and scroll controls, and the General and Combat Log tabs. Whisper tabs remain available.</li>
   <li><strong>Minimap:</strong> The addon menu, calendar icon and day/night indicator.</li>
-  <li><strong>Interface:</strong> Bag bar, micro menu, experience and other status bars, target buffs and debuffs, and the fishing bobber tooltip.</li>
+  <li><strong>Interface:</strong> Main action bar artwork and gryphons, bag bar, micro menu, experience and other status bars, target buffs and debuffs, and the fishing bobber tooltip.</li>
   <li><strong>When idle:</strong> The player frame at full health, and active action bars when you have no target and are out of combat. You can keep selected action bars visible when your health drops.</li>
 </ul>
 
@@ -52,6 +52,7 @@
 <h2 style="color: #73c9c4;">Changelog</h2>
 
 <ul>
+  <li><strong>0.20.1:</strong> Added an independent option to hide main action bar artwork. Hiding chat tabs now leaves whisper and other tabs under the game's normal control.</li>
   <li><strong>0.20.0:</strong> Added a dedicated page beneath LH Tweaks for every hiding option and action bar health exceptions.</li>
   <li><strong>Recent updates:</strong> Added fishing bobber tooltip, day/night indicator and target aura controls; improved chat tab hiding after login and included shaman totem bars.</li>
   <li><strong>Visibility controls:</strong> Added action bar health exceptions, Hide all and Show all, permanent status bar hiding, and addon menu and calendar icon switches.</li>

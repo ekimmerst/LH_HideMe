@@ -25,7 +25,7 @@ local sections = {
     { title = "Chat", options = {
         { "chat-bar", "Hide idle chat input", "Hide the input field while idle. Press Enter to type. Disabled keeps the General input visible without taking focus." },
         { "chat-buttons", "Hide chat buttons and scroll controls", "Hide buttons and scroll controls on standard chat windows." },
-        { "chat-tabs", "Hide all chat tabs", "Hide all standard chat tabs. When disabled, only the General tab is shown. The Combat Log stays hidden in both modes." },
+        { "chat-tabs", "Hide General and Combat Log tabs", "Hide the General tab. The Combat Log stays hidden in both modes; other tabs, including whispers, follow the game's visibility." },
     } },
     { title = "Minimap", options = {
         { "addons-icon", "Hide the addon menu icon", "Hide the minimap addon compartment button." },
@@ -33,6 +33,7 @@ local sections = {
         { "day-night-indicator", "Hide the day/night indicator", "Hide the minimap day/night indicator and its border." },
     } },
     { title = "Interface", options = {
+        { "bar-artwork", "Hide action bar artwork", "Hide the main bar border and gryphons independently of action buttons, bags and the micro menu." },
         { "bag-bar", "Hide the bag bar", "Hide the standard bag bar." },
         { "micro-menu", "Hide the micro menu", "Hide the standard micro menu." },
         { "exp-bar", "Hide status bars", "Permanently hide experience, reputation and other status bars, including their borders." },
@@ -72,9 +73,9 @@ local function Build(category, layout)
     end
     Header(layout, "All hiding options")
     layout:AddInitializer(CreateSettingsButtonInitializer("Enable every hiding option", "Hide all",
-        function() Command("all on") end, "Enable all 13 hiding options. Keep action bar health exceptions.", true))
+        function() Command("all on") end, "Enable all 14 hiding options. Keep action bar health exceptions.", true))
     layout:AddInitializer(CreateSettingsButtonInitializer("Disable every hiding option", "Show all",
-        function() Command("all off") end, "Disable hiding options. Only the General chat tab is shown; the Combat Log remains hidden. Keep action bar health exceptions.", true))
+        function() Command("all off") end, "Disable hiding options. The General tab is shown, the Combat Log remains hidden, and other chat tabs follow the game. Keep action bar health exceptions.", true))
 end
 
 -- The required core queues this page until its root category is ready.
