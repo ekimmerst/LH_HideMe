@@ -48,6 +48,11 @@ local sections = {
 
 local function Build(category, layout)
     Addon.category = category
+    LH_Tweaks:RegisterHeaderActions(category,
+        {text = "Hide all", callback = function() Command("all on") end,
+            tooltip = "Enable all 14 hiding options. Keep action bar health exceptions."},
+        {text = "Show all", callback = function() Command("all off") end,
+            tooltip = "Disable hiding options. The General tab is shown, the Combat Log remains hidden, and other chat tabs follow the game. Keep action bar health exceptions."})
     for _, section in ipairs(sections) do
         Header(layout, section.title)
         for _, option in ipairs(section.options) do
@@ -71,11 +76,6 @@ local function Build(category, layout)
         Settings.CreateCheckbox(category, setting,
             "While action-bar hiding is enabled, also show this active bar below full health. Numbers match the game's action bar settings. Requires the health API. Saved exceptions are retained by Hide all and Show all.")
     end
-    Header(layout, "All hiding options")
-    layout:AddInitializer(CreateSettingsButtonInitializer("Enable every hiding option", "Hide all",
-        function() Command("all on") end, "Enable all 14 hiding options. Keep action bar health exceptions.", true))
-    layout:AddInitializer(CreateSettingsButtonInitializer("Disable every hiding option", "Show all",
-        function() Command("all off") end, "Disable hiding options. The General tab is shown, the Combat Log remains hidden, and other chat tabs follow the game. Keep action bar health exceptions.", true))
 end
 
 -- The required core queues this page until its root category is ready.

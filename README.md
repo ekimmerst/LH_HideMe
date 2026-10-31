@@ -48,6 +48,12 @@
 
 <h2 style="color: #73c9c4;">Changelog</h2>
 
+<p><strong>0.20.2 - Forever and Retail</strong></p>
+
+<ul>
+  <li>Moved Hide all and Show all into the settings title bar, directly left of Defaults.</li>
+</ul>
+
 <p><strong>0.20.1 - Forever</strong></p>
 
 <ul>

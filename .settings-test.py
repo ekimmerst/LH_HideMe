@@ -59,9 +59,14 @@ assert(not BagsBar.shown)
 -- Slash changes notify the same settings and bulk toggles retain exceptions.
 SlashCmdList.LH_HIDEME('except toolbar 3')
 assert(registry.LH_HideMe_toolbarException3.get() and notices.LH_HideMe_toolbarException3>0)
-buttons['Enable every hiding option']()
+SettingsPanel:DisplayCategory(category)
+local header=SettingsPanel.list.Header
+local hideAll,showAll=header.children[2],header.children[3]
+assert(hideAll.text=='Hide all' and showAll.text=='Show all')
+assert(showAll.points[1][2]==header.DefaultsButton and hideAll.points[1][2]==showAll)
+hideAll:Click()
 for name in pairs(LH_HideMe.targets) do assert(LH_HideMe:GetOption(name)) end
-buttons['Disable every hiding option']()
+showAll:Click()
 for name in pairs(LH_HideMe.targets) do assert(not LH_HideMe:GetOption(name)) end
 assert(LH_HideMe:GetToolbarException(3))
 -- Native Defaults applies the default value to this category's proxies only.
@@ -74,6 +79,10 @@ hideEvent.scripts.OnEvent(hideEvent,'ADDON_LOADED','LH_HideMe')
 assert(registry.LH_HideMe_bag_bar.get() and registry.LH_HideMe_toolbarException8.get())
 SettingsPanel:DisplayCategory(category)
 assert(SettingsPanel.list.Header.Title.text=='LH HideMe')
+SettingsPanel:DisplayCategory(LH_Tweaks.category)
+assert(hideAll.text=='Enable all' and showAll.text=='Disable all')
+SettingsPanel:DisplayCategory(category)
+assert(hideAll.text=='Hide all' and showAll.text=='Show all')
 ''')
 assert (addon / 'Media/Icon.tga').read_bytes() == (core / 'Icon.tga').read_bytes()
 assert (addon / 'Media/Icon.png').read_bytes() == (core / 'Icon.png').read_bytes()
