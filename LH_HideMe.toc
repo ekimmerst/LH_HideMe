@@ -6,8 +6,9 @@
 ## IconTexture: Interface\AddOns\LH_HideMe\Media\Icon
 ## Notes: Hide UI elements through LH Tweaks settings or chat commands.
 ## Author: LH_HideMe
-## Version: 0.20.2
+## Version: 0.20.3
 ## SavedVariablesPerCharacter: LH_HideMeDB
 
 LH_HideMe.lua
 Settings.lua
+SettingsLayout.xml

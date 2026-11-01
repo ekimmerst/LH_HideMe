@@ -10,6 +10,8 @@ lua.execute('''
 local M=getmetatable(UIParent).__index
 function M:Show() self.shown=true end
 function M:SetAlpha(v) self.alpha=v end
+function GameTooltip:HookScript() end
+function GameTooltip:IsShown() return false end
 function UnitExists() return false end
 BagsBar=CreateFrame('Frame',nil,UIParent)
 MainActionBar=CreateFrame('Frame',nil,UIParent)
@@ -21,11 +23,48 @@ combat=false
 ''')
 lua.execute((addon / 'LH_HideMe.lua').read_text(), 'LH_HideMe')
 lua.execute("hideEvent=frames[#frames];hideEvent.scripts.OnEvent(hideEvent,'ADDON_LOADED','LH_HideMe')")
+lua.execute('''
+function Settings.CreateElementInitializer(template, data)
+ local row={template=template,data=data,tags={}}
+ function row:AddSearchTags(tag) self.tags[#self.tags+1]=tag end
+ function row:GetData() return self.data end
+ return row
+end
+''')
 lua.execute((addon / 'Settings.lua').read_text(), 'LH_HideMe')
 lua.execute('''
 local module=LH_Tweaks.modules.LH_HideMe
 local category=module.category
 assert(module.title=='LH HideMe' and category.parent==LH_Tweaks.category)
+assert(#category.layout.rows==3)
+local rows=category.layout.rows
+assert(rows[1].template=='LHHideMeSettingsRowTemplate')
+assert(rows[1].data.sections[1].title=='Chat' and rows[1].data.sections[2].title=='Minimap')
+assert(rows[2].data.sections[1].title=='Interface' and rows[2].data.sections[2].title=='Conditional visibility')
+assert(rows[3].data.sections[1].title=='Action bar health exceptions')
+assert(#rows[1].data.sections[1].options==3 and #rows[1].data.sections[2].options==3)
+assert(#rows[2].data.sections[1].options==6 and #rows[2].data.sections[2].options==2)
+assert(#rows[3].data.sections[1].options==4 and #rows[3].data.sections[2].options==4)
+for _,row in ipairs(rows) do assert(row:GetExtent()==row.data.height and #row.tags>0) end
+local M=getmetatable(UIParent).__index
+function M:SetHeight(height) self.h=height end
+function M:SetWidth(width) self.w=width end
+function M:SetJustifyH() end
+function M:SetChecked(value) self.checked=value end
+function M:GetChecked() return self.checked end
+function M:CreateFontString() return CreateFrame('FontString',nil,self) end
+local row=CreateFrame('Frame',nil,UIParent)
+for name,method in pairs(LHHideMeSettingsRowMixin) do row[name]=method end
+row:Init(rows[1])
+assert(row.headers[1].text=='Chat' and row.headers[2].text=='Minimap')
+assert(row.checkboxes[1].optionName=='chat-bar' and row.checkboxes[4].optionName=='addons-icon')
+row.checkboxes[1]:SetChecked(true);row.checkboxes[1].scripts.OnClick(row.checkboxes[1])
+assert(LH_HideMe:GetOption('chat-bar') and row.checkboxes[1]:GetChecked())
+row:Init(rows[3])
+assert(row.checkboxes[1].optionName=='except toolbar 1' and row.checkboxes[5].optionName=='except toolbar 5')
+row.checkboxes[1]:SetChecked(true);row.checkboxes[1].scripts.OnClick(row.checkboxes[1])
+assert(LH_HideMe:GetToolbarException(1) and row.checkboxes[1]:GetChecked())
+row:Release()
 local count=0
 for variable,setting in pairs(registry) do
  if setting.category==category then
@@ -86,4 +125,4 @@ assert(hideAll.text=='Hide all' and showAll.text=='Show all')
 ''')
 assert (addon / 'Media/Icon.tga').read_bytes() == (core / 'Icon.tga').read_bytes()
 assert (addon / 'Media/Icon.png').read_bytes() == (core / 'Icon.png').read_bytes()
-print('PASS: nested module category, all 22 controls, artwork isolation and combat deferral, command/UI synchronization, scoped defaults, bulk preservation, saved settings and identical icons')
+print('PASS: two-column settings rows and clicks, all 22 proxies, artwork isolation and combat deferral, command/UI synchronization, scoped defaults, bulk preservation, saved settings and identical icons')

@@ -48,6 +48,12 @@
 
 <h2 style="color: #73c9c4;">Changelog</h2>
 
+<p><strong>0.20.3 - Forever and Retail</strong></p>
+
+<ul>
+  <li>Arranged settings in two columns, with related categories and their options side by side.</li>
+</ul>
+
 <p><strong>0.20.2 - Forever and Retail</strong></p>
 
 <ul>

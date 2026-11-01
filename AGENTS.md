@@ -8,6 +8,7 @@
 - Communicate with the user in German. All addon messages, comments, metadata, and project documentation must be in English, as requested by the user on October 11, 2026.
 - Work on LH_HideMe. Other addons in the parent directory are separate projects.
 - Keep this file up to date when making relevant changes.
+- Version 0.20.3 arranges LH HideMe settings in paired two-column groups (Chat/Minimap, Interface/Conditional visibility) and splits action bar health exceptions across both columns. SettingsLayout.xml supplies a native Settings list row template. All 22 proxy settings remain registered for Defaults and slash synchronization. .settings-test.py checks grouping, clicks, and the previous proxy behaviors; the two-column rendering still needs in-game verification on Forever and Retail.
 - The Forever branch keeps interface 16001. Version 0.20.1 adds independent MainActionBar EndCaps/BorderArt hiding and limits chat-tab hiding to General and Combat Log; whisper tabs follow Blizzard. Classic bag/micro button discovery remains TBC-only. .settings-test.py passes the Forever artwork and combat checks. Live in-game verification is pending.
 
 ## Project and repository
