@@ -8,6 +8,7 @@
 - Communicate with the user in German. All addon messages, comments, metadata, and project documentation must be in English, as requested by the user on October 11, 2026.
 - Work on LH_HideMe. Other addons in the parent directory are separate projects.
 - Keep this file up to date when making relevant changes.
+- Version 0.20.4 shows the player frame when either health or mana is below full. The user confirmed the mana behavior in game on November 19, 2026. Characters without a mana pool retain health-only visibility. Action bar exceptions still use health only.
 - Version 0.20.3 arranges LH HideMe settings in paired two-column groups (Chat/Minimap, Interface/Conditional visibility) and splits action bar health exceptions across both columns. SettingsLayout.xml supplies a native Settings list row template. All 22 proxy settings remain registered for Defaults and slash synchronization. .settings-test.py checks grouping, clicks, and the previous proxy behaviors; the two-column rendering still needs in-game verification on Forever and Retail.
 - The Forever branch keeps interface 16001. Version 0.20.1 adds independent MainActionBar EndCaps/BorderArt hiding and limits chat-tab hiding to General and Combat Log; whisper tabs follow Blizzard. Classic bag/micro button discovery remains TBC-only. .settings-test.py passes the Forever artwork and combat checks. Live in-game verification is pending.
 
@@ -18,7 +19,7 @@
 - Public repository: https://github.com/ekimmerst/LH_HideMe
 - Remote origin: https://github.com/ekimmerst/LH_HideMe.git
 - Branch: main, tracking origin/main. Local commit history is preserved.
-- As of October 21, 2026: version 0.20.0; interface version 16001.
+- As of November 19, 2026: version 0.20.4; interface versions 16001 and 120105.
 - Last verified commit before the 0.15.0 publication: 77e5927 (Simplify README for addon users).
 - The user successfully published the addon previously.
 - Requires LH_Tweaks as the shared configuration host; no build step.
@@ -58,7 +59,7 @@ Configured through Settings > AddOns > LH Tweaks > LH HideMe, or through the cha
 - /lh_hideme fishing-bobber-tooltip off: allow normal mouseover tooltips again.
 - /lh_hideme micro-menu on: hide the micro menu.
 - /lh_hideme micro-menu off: show the micro menu.
-- /lh_hideme player-frame on: show the player frame with a target, in combat, or below full health.
+- /lh_hideme player-frame on: show the player frame with a target, in combat, or below full health or mana.
 - /lh_hideme player-frame off: always show the player frame.
 - /lh_hideme toolbars on: show active standard action bars only with a target or in combat.
 - /lh_hideme toolbars off: always show active standard action bars.
@@ -113,8 +114,8 @@ it does not measure actual visibility when other addons interfere.
 - toolbars: LH_HideMeDB.hideToolbars. MainActionBar, MultiBarBottomLeft, MultiBarBottomRight, MultiBarRight, MultiBarLeft, MultiBar5/6/7, PetActionBar, StanceBar, PossessActionBar and OverrideActionBar, when available. ApplyToolbars changes alpha only, preserving Blizzard's activation/paging/special-state visibility; it never calls Show/Hide or replaces their state drivers. Transparent bars retain key bindings and may receive mouse input. Third-party bars are not covered.
 - Toolbar alpha updates on target and combat changes; Show hooks restore the current alpha. Hook setup and applied-mode changes wait until out of combat, while alpha can update in combat. Later ADDON_LOADED events retry optional toolbar discovery. Inactive bars remain inactive with off.
 - Version 0.15.0 adds LH_HideMeDB.toolbarExceptions, normalized to eight boolean entries per character. Numbers 1–8 map to MainActionBar, MultiBarBottomLeft, MultiBarBottomRight, MultiBarRight, MultiBarLeft, MultiBar5, MultiBar6 and MultiBar7 (game settings numbering, not action pages). Selected bars use the same health curve as PlayerFrame while hideToolbars is enabled; target/combat still force alpha 1. Without curve support they retain target/combat behavior. No Show/Hide calls or visibility drivers are added. Applied exceptions are copied outside combat so mode changes defer consistently. Player UNIT_HEALTH/UNIT_MAXHEALTH now update toolbar alpha too. Help/status expose exceptions; all on/off preserves them.
-- player-frame: LH_HideMeDB.hidePlayerFrame; frame PlayerFrame. With curve support, the frame stays shown and health controls alpha via UnitHealthPercent("player", false, healthAlphaCurve). A Step curve maps fraction 0 to alpha 1 and fraction 1 to alpha 0. The result is passed directly to SetAlpha, never compared or inspected. Mana is not queried. Transparent frames may remain interactive.
-- Version 0.5.0 failed in game with a secret-number comparison in PlayerNeedsFrame. Version 0.5.1 guarded secret values but kept the frame always visible on the user's client. The user approved removing health/mana conditions temporarily for version 0.5.2; do not restore them without discussing the client restrictions.
+- player-frame: LH_HideMeDB.hidePlayerFrame; frame PlayerFrame. With curve support, the frame stays shown and health controls alpha via UnitHealthPercent("player", false, healthAlphaCurve). A Step curve maps fraction 0 to alpha 1 and fraction 1 to alpha 0. The result is passed directly to SetAlpha, never compared or inspected. Player mana deficit is queried through UnitPowerMissing with Enum.PowerType.Mana; secret values are formatted by C_StringUtil.TruncateWhenZero and checked through a hidden FontString. UNIT_POWER_UPDATE, UNIT_MAXPOWER and UNIT_DISPLAYPOWER refresh player-frame visibility. Transparent frames may remain interactive.
+- Version 0.5.0 failed in game with a secret-number comparison in PlayerNeedsFrame. Version 0.5.1 guarded secret values but kept the frame always visible on the user's client. The user approved removing health/mana conditions temporarily for version 0.5.2. Later health and mana implementations use the newer Forever APIs.
 - RegisterStateDriver keeps the player frame shown with curve support. Clients without the required APIs retain the version 0.5.2 target/combat visibility driver. Registration and direct Show/Hide calls occur only outside combat.
 - PLAYER_TARGET_CHANGED, PLAYER_REGEN_DISABLED, UNIT_HEALTH and UNIT_MAXHEALTH update player alpha; PLAYER_REGEN_ENABLED applies pending settings and reevaluates. target.appliedHiding preserves the applied mode until deferred combat changes can be applied. Target/combat/off set alpha to 1.
 - Settings persist across /reload and game restarts.
@@ -179,7 +180,7 @@ it does not measure actual visibility when other addons interfere.
 - Test chat-buttons: all available menu/channel/social/voice/scroll/minimize controls, multiple docked and undocked windows, new and temporary chat windows, combat-deferred changes, UI refreshes, off restoration, and continued text entry/tab selection/mouse-wheel scrolling. The user confirmed basic functionality in version 0.8.0; the full matrix remains pending.
 - Test exp-bar: permanent border/content disappearance including reputation and other status bars through XP gains, level-ups and other status updates, combat, on/off during combat, /reload, late loading, maximum level, and independence from toolbar settings. Off restores available bars. Version 0.14.0 awaits in-game confirmation.
 - Test toolbars: target select/clear, combat enter/leave, deferred mode changes, enabling/disabling additional bars while hiding is enabled, pet/stance/possess/override states, key bindings, and independence from bag-bar, micro-menu and player-frame settings.
-- Also test the player frame: select/clear a target, enter/leave combat (including clearing a target during combat), enable with a target already selected, change modes during combat, lose health and regenerate to exactly full health. Mana changes must not affect visibility. Verify transparent-frame mouse behavior and off restoring alpha to 1.
+- Also test the player frame: select/clear a target, enter/leave combat (including clearing a target during combat), enable with a target already selected, change modes during combat, lose health and regenerate to exactly full health, spend and regenerate mana, and verify that non-mana classes use health only. Verify transparent-frame mouse behavior and off restoring alpha to 1.
 - Verify that UI updates do not permanently reveal hidden elements and that off restores them.
 - New addons require a game restart; changes to an already loaded LH_HideMe can be loaded with /reload.
 

@@ -10,7 +10,7 @@
   <li><strong>Chat:</strong> Idle chat input, chat buttons and scroll controls, and the General and Combat Log tabs. Whisper tabs remain available.</li>
   <li><strong>Minimap:</strong> The addon menu, calendar icon and day/night indicator.</li>
   <li><strong>Interface:</strong> Main action bar artwork and gryphons, bag bar, micro menu, experience and other status bars, target buffs and debuffs, and the fishing bobber tooltip.</li>
-  <li><strong>When idle:</strong> The player frame at full health, and active action bars when you have no target and are out of combat. You can keep selected action bars visible when your health drops.</li>
+  <li><strong>When idle:</strong> The player frame at full health and mana, and active action bars when you have no target and are out of combat. The player frame returns when health or mana drops; characters without mana use health only. You can keep selected action bars visible when your health drops.</li>
 </ul>
 
 <p>Press Enter to use chat while its idle input is hidden. Hidden action bars still keep their key bindings. Visibility changes made during combat are applied afterward.</p>
@@ -47,6 +47,12 @@
 <p><strong>LH Tweaks is required</strong> and must be installed alongside LH HideMe. I made this for my own UI first, but I hope you can make it yours too. Please post feedback, bugs and improvement ideas in the CurseForge comments.</p>
 
 <h2 style="color: #73c9c4;">Changelog</h2>
+
+<p><strong>0.20.4 - Forever and Retail</strong></p>
+
+<ul>
+  <li>The player frame now reappears when either health or mana is below full. Characters without mana keep the health-only behavior.</li>
+</ul>
 
 <p><strong>0.20.3 - Forever and Retail</strong></p>
 

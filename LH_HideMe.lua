@@ -13,6 +13,8 @@ local updatingAuraAlpha = {}
 local hookedAuraFunctions = {}
 local hookedBobberTooltips = {}
 local healthAlphaCurve
+local manaTextProbe
+local manaReadbackProbe
 -- Numbers match the action bars in Blizzard's settings, not action pages.
 local toolbarNames = { "MainActionBar", "MultiBarBottomLeft", "MultiBarBottomRight",
     "MultiBarRight", "MultiBarLeft", "MultiBar5", "MultiBar6", "MultiBar7" }
@@ -154,7 +156,7 @@ local function PrintHelp()
     Print("/lh_hideme fishing-bobber-tooltip off - Show the fishing bobber tooltip normally.")
     Print("/lh_hideme micro-menu on - Hide the micro menu.")
     Print("/lh_hideme micro-menu off - Show the micro menu.")
-    Print("/lh_hideme player-frame on - Show with a target, in combat, or below full health.")
+    Print("/lh_hideme player-frame on - Show with a target, in combat, or below full health or mana.")
     Print("/lh_hideme player-frame off - Always show the player frame.")
     Print("/lh_hideme targetauras on - Hide target buffs and debuffs.")
     Print("/lh_hideme targetauras off - Show available target buffs and debuffs.")
@@ -202,6 +204,41 @@ local function PlayerNeedsFrame()
     return InCombatLockdown() or UnitExists("target")
 end
 
+local function PlayerManaMissing()
+    if not (UnitPowerMissing and UnitPowerMax and Enum and Enum.PowerType
+        and C_StringUtil and C_StringUtil.TruncateWhenZero and issecretvalue) then
+        return false
+    end
+    local mana = Enum.PowerType.Mana
+    -- A unit without a mana pool must not keep the frame visible.
+    local maximum = UnitPowerMax("player", mana)
+    if issecretvalue(maximum) then return true end
+    if maximum == 0 then return false end
+    local missing = UnitPowerMissing("player", mana)
+    if not issecretvalue(missing) then return missing > 0 end
+
+    -- The client formats the protected value. A nonzero string stays truthy;
+    -- an empty FontString reads back as nil without comparing secret data.
+    if not manaTextProbe then
+        local holder = CreateFrame("Frame")
+        holder:Hide()
+        manaTextProbe = holder:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
+        manaReadbackProbe = holder:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
+    end
+    local ok, text = pcall(function()
+        manaTextProbe:SetText(C_StringUtil.TruncateWhenZero(missing))
+        return manaTextProbe:GetText()
+    end)
+    if not ok then return false end
+    if text then return true end
+    -- Check that GetText still works before treating an empty readback as full mana.
+    local readable, probeText = pcall(function()
+        manaReadbackProbe:SetText("1")
+        return manaReadbackProbe:GetText()
+    end)
+    return not readable or probeText ~= "1"
+end
+
 local function ShouldHide(target, frame)
     if target.chatTabs then
         -- Identify the default General window without relying on localized names.
@@ -214,7 +251,8 @@ end
 
 local function UpdatePlayerAlpha(frame, target)
     if not healthAlphaCurve then return end
-    if not target.appliedHiding or PlayerNeedsFrame() then
+    if not target.appliedHiding or PlayerNeedsFrame()
+        or (target.conditional and PlayerManaMissing()) then
         frame:SetAlpha(1)
     else
         -- Pass the engine-evaluated result directly; never inspect secret health.
@@ -707,6 +745,9 @@ events:RegisterEvent("PLAYER_REGEN_DISABLED")
 events:RegisterEvent("PLAYER_TARGET_CHANGED")
 events:RegisterEvent("UNIT_HEALTH")
 events:RegisterEvent("UNIT_MAXHEALTH")
+events:RegisterEvent("UNIT_POWER_UPDATE")
+events:RegisterEvent("UNIT_MAXPOWER")
+events:RegisterEvent("UNIT_DISPLAYPOWER")
 events:RegisterEvent("UNIT_AURA")
 events:RegisterEvent("UPDATE_CHAT_WINDOWS")
 events:RegisterEvent("UPDATE_FLOATING_CHAT_WINDOWS")
@@ -754,6 +795,11 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
             ApplyTarget(targets["player-frame"])
             ApplyTarget(targets["toolbars"])
             if event == "PLAYER_TARGET_CHANGED" then ApplyTargetAuras(targets.targetauras) end
+        end
+    elseif event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER"
+        or event == "UNIT_DISPLAYPOWER" then
+        if LH_HideMeDB and loadedAddon == "player" then
+            ApplyTarget(targets["player-frame"])
         end
     else
         ApplyTargets(event == "PLAYER_REGEN_ENABLED")
@@ -837,7 +883,7 @@ SlashCmdList.LH_HIDEME = function(message)
     local action = LH_HideMeDB[target.setting] and "hidden." or "shown."
     if target.conditional then
         action = LH_HideMeDB[target.setting]
-            and (healthAlphaCurve and "shown with a target, in combat, or below full health."
+            and (healthAlphaCurve and "shown with a target, in combat, or below full health or mana."
                 or "shown only with a target or in combat (health API unavailable).")
             or "always shown."
     elseif target.chatInput then
