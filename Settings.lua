@@ -41,7 +41,7 @@ local sections = {
         { "targetauras", "Hide target buffs and debuffs", "Hide aura artwork on Blizzard's target frame." },
     } },
     { title = "Conditional visibility", options = {
-        { "player-frame", "Hide the player frame when idle at full health and mana", "Show the player frame with a target, in combat, below full health or below full mana. Characters without mana use health only. Without the required health API, target and combat visibility are used." },
+        { "player-frame", "Hide the player frame when idle at full health and mana", "Show the player frame with a target, in combat, below full health or below full mana. Keep it hidden as a ghost. Characters without mana use health only. Without the required health API, target and combat visibility are used." },
         { "toolbars", "Hide action bars when idle", "Show active standard action bars with a target or in combat, including available pet, stance and shaman totem bars. Key bindings remain usable." },
     } },
 }
@@ -51,7 +51,7 @@ for number = 1, 8 do
     exceptionSection.options[number] = {
         "except toolbar " .. number,
         "Show action bar " .. number .. " below full health",
-        "While action-bar hiding is enabled, also show this active bar below full health. Numbers match the game's action bar settings. Requires the health API. Saved exceptions are retained by Hide all and Show all.",
+        "While action-bar hiding is enabled, also show this active bar below full health, except as a ghost. Numbers match the game's action bar settings. Requires the health API. Saved exceptions are retained by Hide all and Show all.",
     }
 end
 

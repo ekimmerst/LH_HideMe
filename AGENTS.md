@@ -8,6 +8,7 @@
 - Communicate with the user in German. All addon messages, comments, metadata, and project documentation must be in English, as requested by the user on October 11, 2026.
 - Work on LH_HideMe. Other addons in the parent directory are separate projects.
 - Keep this file up to date when making relevant changes.
+- Version 0.20.5 keeps the player frame and hidden action bars transparent while the player is a ghost, including bars with health exceptions. PLAYER_ALIVE updates visibility when the player releases their spirit; PLAYER_UNGHOST restores normal behavior after resurrection. The user confirmed the behavior in game on November 24, 2026.
 - Version 0.20.4 shows the player frame when either health or mana is below full. The user confirmed the mana behavior in game on November 19, 2026. Characters without a mana pool retain health-only visibility. Action bar exceptions still use health only.
 - Version 0.20.3 arranges LH HideMe settings in paired two-column groups (Chat/Minimap, Interface/Conditional visibility) and splits action bar health exceptions across both columns. SettingsLayout.xml supplies a native Settings list row template. All 22 proxy settings remain registered for Defaults and slash synchronization. .settings-test.py checks grouping, clicks, and the previous proxy behaviors; the two-column rendering still needs in-game verification on Forever and Retail.
 - The Forever branch keeps interface 16001. Version 0.20.1 adds independent MainActionBar EndCaps/BorderArt hiding and limits chat-tab hiding to General and Combat Log; whisper tabs follow Blizzard. Classic bag/micro button discovery remains TBC-only. .settings-test.py passes the Forever artwork and combat checks. Live in-game verification is pending.
@@ -19,7 +20,7 @@
 - Public repository: https://github.com/ekimmerst/LH_HideMe
 - Remote origin: https://github.com/ekimmerst/LH_HideMe.git
 - Branch: main, tracking origin/main. Local commit history is preserved.
-- As of November 19, 2026: version 0.20.4; interface versions 16001 and 120105.
+- As of November 24, 2026: version 0.20.5; interface versions 16001 and 120105.
 - Last verified commit before the 0.15.0 publication: 77e5927 (Simplify README for addon users).
 - The user successfully published the addon previously.
 - Requires LH_Tweaks as the shared configuration host; no build step.

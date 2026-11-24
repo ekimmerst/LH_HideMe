@@ -204,6 +204,10 @@ local function PlayerNeedsFrame()
     return InCombatLockdown() or UnitExists("target")
 end
 
+local function PlayerIsGhost()
+    return UnitIsGhost and UnitIsGhost("player")
+end
+
 local function PlayerManaMissing()
     if not (UnitPowerMissing and UnitPowerMax and Enum and Enum.PowerType
         and C_StringUtil and C_StringUtil.TruncateWhenZero and issecretvalue) then
@@ -251,7 +255,9 @@ end
 
 local function UpdatePlayerAlpha(frame, target)
     if not healthAlphaCurve then return end
-    if not target.appliedHiding or PlayerNeedsFrame()
+    if target.appliedHiding and PlayerIsGhost() then
+        frame:SetAlpha(0)
+    elseif not target.appliedHiding or PlayerNeedsFrame()
         or (target.conditional and PlayerManaMissing()) then
         frame:SetAlpha(1)
     else
@@ -270,7 +276,7 @@ local function UpdateToolbarAlpha(frame, target)
             break
         end
     end
-    local hidden = target.appliedHiding and not PlayerNeedsFrame()
+    local hidden = target.appliedHiding and (PlayerIsGhost() or not PlayerNeedsFrame())
     frame:SetAlpha(hidden and 0 or 1)
 end
 
@@ -743,6 +749,9 @@ events:RegisterEvent("PLAYER_ENTERING_WORLD")
 events:RegisterEvent("PLAYER_REGEN_ENABLED")
 events:RegisterEvent("PLAYER_REGEN_DISABLED")
 events:RegisterEvent("PLAYER_TARGET_CHANGED")
+events:RegisterEvent("PLAYER_DEAD")
+events:RegisterEvent("PLAYER_ALIVE")
+events:RegisterEvent("PLAYER_UNGHOST")
 events:RegisterEvent("UNIT_HEALTH")
 events:RegisterEvent("UNIT_MAXHEALTH")
 events:RegisterEvent("UNIT_POWER_UPDATE")
@@ -789,6 +798,7 @@ events:SetScript("OnEvent", function(_, event, loadedAddon)
             HideCombatLog()
         end
     elseif event == "PLAYER_REGEN_DISABLED" or event == "PLAYER_TARGET_CHANGED"
+        or event == "PLAYER_DEAD" or event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST"
         or event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
         if LH_HideMeDB and (event ~= "UNIT_HEALTH" and event ~= "UNIT_MAXHEALTH"
             or loadedAddon == "player") then
